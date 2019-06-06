@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.saeon.mims.accession.request.IngestRequest;
+import org.saeon.mims.accession.util.HashUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,7 +52,13 @@ public class AccessionController {
                 e.printStackTrace();
             }
         } else if (file.isDirectory()){
-
+            try {
+                String md5 = HashUtils.hashDirectory(file.getAbsolutePath(), true);
+                log.info("MD5 for folder [{}] is {}", file.getName(), md5);
+                body.append(md5);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             log.info("File is not a directory or file. Probably does not exist. Returning error");
             return ResponseEntity.status(422).body(new Gson().toJson("Ingest object is not a file or folder"));

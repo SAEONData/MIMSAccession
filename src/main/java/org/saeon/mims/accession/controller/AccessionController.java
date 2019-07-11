@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 @RestController(value = "/")
 @Slf4j
@@ -37,11 +38,12 @@ public class AccessionController {
         File file = new File(basefolder + "\\" + fileFolder);
         StringBuilder body = new StringBuilder();
         log.info("File name: {}", file.getAbsolutePath());
-        log.info("Is directory? {}", file.isDirectory() ? "Yes" : "No");
-        log.info("Is file? {}", file.isFile() ? "Yes" : "No");
-        log.info("Can read? {}", file.canRead() ? "Yes" : "No");
-        log.info("Can write? {}", file.canWrite() ? "Yes" : "No");
-        log.info("Can execute? {}", file.canExecute() ? "Yes" : "No");
+        log.info("Type: {}", file.isDirectory() ? "Directory" : file.isFile() ? "File" : "Unknown");
+        log.info("Access Rights: {} | {} | {}",
+                file.canRead() ? "Read Allowed" : "Read Denied",
+                file.canWrite() ? "Write Allowed" : "Write Denied",
+                file.canExecute() ? "Execute Allowed" : "Execute Denied");
+
         if (file.isFile()) {
             String md5;
             try {
@@ -53,7 +55,8 @@ public class AccessionController {
             }
         } else if (file.isDirectory()){
             try {
-                String md5 = HashUtils.hashDirectory(file.getAbsolutePath(), true);
+//                String md5 = HashUtils.hashDirectory(file.getAbsolutePath(), true);
+                String md5 = HashUtils.prepareMD5HashMapForDirectory(file.getAbsolutePath());
                 log.info("MD5 for folder [{}] is {}", file.getName(), md5);
                 body.append(md5);
             } catch (IOException e) {

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Register - MIMS Accession Area</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}" />
+    <link rel="stylesheet" th:href="@{/css/mims.css}" />
+</head>
+<body>
+<div class="container">
+<h1>Register for MIMS</h1>
+<form action="/register" th:object="${user}" method="POST" enctype="utf8">
+    <div class="form-group row">
+        <div class="col-3"><label>First Name</label></div>
+        <div class="col-9">
+            <input th:field="*{firstName}"/>
+            <span class="error" th:each="error: ${errors}" th:if="${error.fieldName == 'firstName'}" th:text="${error.message}">Validation error</span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-3"><label>Surname</label></div>
+        <div class="col-9">
+            <input width="100%" th:field="*{lastName}"/>
+            <span class="error" th:each="error: ${errors}" th:if="${error.fieldName == 'lastName'}" th:text="${error.message}">Validation error</span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-3"><label>Email address</label></div>
+        <div class="col-9">
+            <input type="email" th:field="*{email}"/>
+            <span class="error" th:each="error: ${errors}" th:if="${error.fieldName == 'email'}" th:text="${error.message}">Validation error</span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-3"><label>Password</label></div>
+        <div class="col-9">
+            <input type="password" width="120" th:field="*{password}"/>
+            <span class="error" th:each="error: ${errors}" th:if="${error.fieldName == 'password'}" th:text="${error.message}">Validation error</span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-3"><label>Confirm password</label></div>
+        <div class="col-9"><input type="password" th:field="*{matchingPassword}"/></div>
+    </div>
+    <div class="form-group row">
+        <div class="col-6"><button type="submit">Register</button></div>
+        <div class="col-6"><a th:href="@{/login.html}">Login</a></div>
+    </div>
+</form>
+
+
+</div>
+</body>
+</html>

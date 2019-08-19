@@ -4,7 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
@@ -66,7 +67,7 @@ public class HashUtils {
 
         directoryContents.forEach((dir,contents)->{
             try (SequenceInputStream sequenceInputStream = new SequenceInputStream(contents.elements())) {
-                md5List.put(dir, DigestUtils.md5Hex(sequenceInputStream));
+                md5List.put(dir, DigestUtils.md5Hex(sequenceInputStream).toUpperCase());
             } catch (IOException e) {
 
             }
@@ -74,7 +75,7 @@ public class HashUtils {
 
         boolean writtenFile = writeMD5ChecksumFile(absolutePath, md5List);
 
-        String overallMD5 = "";
+        String overallMD5 = md5List.get(directory.getName());
         return overallMD5;
 
     }

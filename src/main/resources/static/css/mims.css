@@ -1,0 +1,34 @@
+@import url('https://fonts.googleapis.com/css?family=Inconsolata|Forum|EB+Garamond');
+
+* {
+    font-family: 'EB Garamond', cursive;
+}
+
+.mims\.menu {
+    padding: 5px;
+}
+
+.error {
+    color: darkred;
+    background-color: darkgrey;
+}
+
+h1 {
+    font-family: 'EB Garamond', cursive;
+    padding-bottom: 5px;
+    border-bottom: 2px solid;
+}
+
+h5 {
+    font-family: 'Forum', cursive;
+    border-bottom: 1px solid;
+    padding: 2px;
+}
+
+h6 {
+    font-family: 'Inconsolata', cursive;
+}
+
+.table-row {
+    border-top: 1px solid;
+}

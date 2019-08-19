@@ -1,24 +1,28 @@
 package org.saeon.mims.accession.controller;
 
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.saeon.mims.accession.exception.AccessionException;
+import org.saeon.mims.accession.model.accession.Accession;
+import org.saeon.mims.accession.request.IngestRequest;
+import org.saeon.mims.accession.response.AccessionError;
 import org.saeon.mims.accession.response.AccessionValidationError;
 import org.saeon.mims.accession.service.AccessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller(value = "/")
+@RestController
 @Slf4j
-public class AccessionController {
+public class AccessionControllerAPI {
 
     @Autowired
     private AccessionService accessionService;
@@ -26,16 +30,27 @@ public class AccessionController {
     @Value("${base.folder}")
     private String basefolder;
 
-    @GetMapping(value = "/")
-    public String getHTML() {
-        log.info("Home page requested");
-        return "home";
+    @GetMapping(value = "/api/")
+    public String get() {
+        log.info("Base folder: {}", basefolder);
+        return "OK";
+
     }
 
-    @GetMapping(value = "/ingest")
-    public String getIngestHome() {
-        log.info("Ingest home page requested");
-        return "ingest/home";
+    @PostMapping(value = "/api/ingest", headers = "Accept=application/json")
+    public ResponseEntity register(@Valid @RequestBody IngestRequest ingestRequest) {
+        log.info("New request: {}", ingestRequest);
+
+        //validate the ingestRequest, including 'does the file actually exist?'
+
+        Accession accession;
+        try {
+            accession = accessionService.ingestAccession(ingestRequest, basefolder);
+        } catch (AccessionException e) {
+            return ResponseEntity.status(e.getCode()).body(new Gson().toJson(new AccessionError(e)));
+        }
+
+        return ResponseEntity.ok(new Gson().toJson(accession));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -56,6 +56,11 @@ public class User {
     @Setter
     private List<Role> roles;
 
+    @Column
+    @Getter
+    @Setter
+    private String authToken;
+
     public String getFullName() {
         return firstName + " " + lastName;
     }

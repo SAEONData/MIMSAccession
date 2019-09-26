@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Signin - Sanctuary Tycoon</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}" />
+    <link rel="stylesheet" th:href="@{/css/mims.css}" />
+</head>
+<body>
+<div class="container">
+
+    Sign In:<br /><br />
+
+    <div class="error" th:text="${error}"></div>
+    <form th:action="@{/ingest/signin}" th:object="${user}" method="post" class="form-horizontal">
+        <div class="form-group row">
+            <label for="usr" class="col-xs col-form-label mr-2">Email:</label>
+            <div class="col-sm"><input type="text" th:field="*{email}" id="usr" placeholder="Your email" class="form-control"/></div>
+        </div>
+        <div class="form-group row">
+            <label for="pwd" class="col-xs col-form-label mr-2">Password:</label>
+            <div class="col-sm"><input type="password" th:field="*{password}" id="pwd" placeholder="A secure password" class="form-control" /></div>
+        </div>
+
+        <div class="form-group row">
+            <button class="btn btn-primary btn-lrg" type="submit">Sign in</button>
+            <span th:if="${error} == 'Username not found'">&nbsp;&nbsp;<a class="btn btn-primary btn-lrg" th:href="@{/register}">Register</a></span>
+        </div>
+    </form>
+
+</div>
+
+</body>
+</html>

@@ -9,6 +9,65 @@
 <body>
 <div class="container">
 Welcome to the accessioning home page.
+    <form th:action="@{/ingest/accession}" th:object="${accession}" method="post" class="form-horizontal">
+
+        <div class="form-group row">
+            <label for="accNumber" class="col-xs col-form-label col-3">Accession number:</label>
+            <div class="col-sm">
+                <input type="text" th:field="*{accessionNumber}" id="accNumber" class="form-control"/>
+                <span class="hint">A pre-assigned accession number, if one was given to this accession.</span>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="parentAccNumber" class="col-xs col-form-label col-3">Parent accession number:</label>
+            <div class="col-sm">
+                <input type="text" th:field="*{parentAccessionNumber}" id="parentAccNumber" class="form-control" />
+                <span class="hint">The parent accession number, if applicable</span>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="accessionName" class="col-xs col-form-label col-3">Accession name:</label>
+            <div class="col-sm">
+                <input type="text" th:field="*{name}" id="accessionName" class="form-control" />
+                <span class="hint">The name of your accession</span>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="homeFolder" class="col-xs col-form-label col-3">Accession home folder:</label>
+            <div class="col-sm">
+                <input type="text" th:field="*{homeFolder}" id="homeFolder" class="form-control" />
+                <span class="hint">The folder on the server containing your accession</span>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="embargoType" class="col-xs col-form-label col-3">Embargo type:</label>
+            <div class="col-sm">
+
+                <select th:field="*{embargoState}" id="embargoType" class="form-control">
+                    <option th:value="'1'" th:text="'...'"></option>
+                    <option th:each="type : ${embargoTypes}" th:value="${type.id}" th:text="${type.name}"></option>
+                </select>
+                <span class="hint">The embargo type for this accession</span>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="embargoExpiry" class="col-xs col-form-label col-3">Embargo expiry:</label>
+            <div class="col-sm">
+                <input type="date" th:field="*{embargoExpiry}" id="embargoExpiry" class="form-control" />
+                <span class="hint">The date on which this embargo will expire. Only valid for 'Embargoed' accessions</span>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <button class="btn btn-primary btn-lrg" type="submit">Accession</button>
+            <span th:if="${error} == 'Username not found'">&nbsp;&nbsp;<a class="btn btn-primary btn-lrg" th:href="@{/register}">Register</a></span>
+        </div>
+    </form>
 </div>
 </body>
 </html>

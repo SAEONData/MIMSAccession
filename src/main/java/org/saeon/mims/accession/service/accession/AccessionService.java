@@ -1,11 +1,13 @@
-package org.saeon.mims.accession.service;
+package org.saeon.mims.accession.service.accession;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.saeon.mims.accession.exception.AccessionException;
 import org.saeon.mims.accession.model.accession.Accession;
+import org.saeon.mims.accession.repository.AccessionRepository;
 import org.saeon.mims.accession.request.IngestRequest;
 import org.saeon.mims.accession.util.HashUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -16,7 +18,9 @@ import java.io.IOException;
 @Slf4j
 public class AccessionService {
 
-    public Accession ingestAccession(IngestRequest ingestRequest, String basefolder) throws AccessionException {
+    @Autowired private AccessionRepository accessionRepository;
+
+    public Accession ingestAccessionAPI(IngestRequest ingestRequest, String basefolder) throws AccessionException {
         Accession accession = new Accession();
 
         String fileFolder = ingestRequest.getIngestObject();

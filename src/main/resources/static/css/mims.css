@@ -32,3 +32,8 @@ h6 {
 .table-row {
     border-top: 1px solid;
 }
+
+.hint {
+    font-size: small;
+    color: #1b1e21;
+}

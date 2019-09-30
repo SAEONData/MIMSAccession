@@ -59,4 +59,8 @@ public class UserService {
     public void updateUser(User user) {
         userRepository.save(user);
     }
+
+    public User getUserByAuthToken(String authToken) {
+        return userRepository.findDistinctByAuthToken(authToken);
+    }
 }

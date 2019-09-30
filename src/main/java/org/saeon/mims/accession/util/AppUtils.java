@@ -14,14 +14,14 @@ import java.util.List;
 @Service
 public class AppUtils {
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static String getAuthTokenFromRequest(HttpServletRequest request) {
         if (request.getCookies() != null) {
 
             List<Cookie> cookies = Arrays.asList(request.getCookies());
             if (cookies != null && !cookies.isEmpty()) {
-                Cookie c = cookies.stream().filter(cookie -> cookie.getName().equalsIgnoreCase("sanctuarytycoon")).findFirst().orElse(null);
+                Cookie c = cookies.stream().filter(cookie -> cookie.getName().equalsIgnoreCase("mims-accession")).findFirst().orElse(null);
                 if (c != null) {
                     return c.getValue();
                 }

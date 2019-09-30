@@ -7,7 +7,7 @@ import org.saeon.mims.accession.model.accession.Accession;
 import org.saeon.mims.accession.request.IngestRequest;
 import org.saeon.mims.accession.response.AccessionError;
 import org.saeon.mims.accession.response.AccessionValidationError;
-import org.saeon.mims.accession.service.AccessionService;
+import org.saeon.mims.accession.service.accession.AccessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -45,7 +45,7 @@ public class AccessionControllerAPI {
 
         Accession accession;
         try {
-            accession = accessionService.ingestAccession(ingestRequest, basefolder);
+            accession = accessionService.ingestAccessionAPI(ingestRequest, basefolder);
         } catch (AccessionException e) {
             return ResponseEntity.status(e.getCode()).body(new Gson().toJson(new AccessionError(e)));
         }

@@ -2,10 +2,12 @@ package org.saeon.mims.accession.model.accession;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
+import org.saeon.mims.accession.util.AppUtils;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Set;
 
@@ -38,11 +40,29 @@ public class Accession {
 
     @Getter
     @Setter
+    @Enumerated(value = EnumType.STRING)
     private EmbargoType embargoState;
 
     @Getter
     @Setter
     private Date embargoExpiry;
+
+    /******************************************
+     *
+     * UTILITY METHODS
+     *
+     ******************************************/
+
+    public void setEmbargoExpiry(String date) {
+        if (StringUtils.isNotEmpty(date)) {
+            LocalDate d = AppUtils.convertStringToDate(date);
+            this.embargoExpiry = Date.from(d.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        }
+    }
+
+    public void setEmbargoState(String embargoType) {
+        this.embargoState = EmbargoType.getById(Integer.parseInt(embargoType));
+    }
 
 
 }

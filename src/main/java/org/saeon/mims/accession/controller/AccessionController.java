@@ -1,7 +1,7 @@
 package org.saeon.mims.accession.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.saeon.mims.accession.service.AccessionService;
+import org.saeon.mims.accession.service.accession.AccessionService;
 import org.saeon.mims.accession.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -2,58 +2,18 @@ package org.saeon.mims.accession.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.saeon.mims.accession.model.accession.Accession;
+import org.saeon.mims.accession.model.accession.FileChecksum;
+import org.saeon.mims.accession.repository.FileChecksumRepository;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public class HashUtils {
-
-//    public static String hashDirectory(String directoryPath, boolean includeHiddenFiles) throws IOException {
-//        File directory = new File(directoryPath);
-//        StringBuilder sb = new StringBuilder();
-//
-//        if (!directory.isDirectory())
-//        {
-//            throw new IllegalArgumentException("Not a directory");
-//        }
-//
-//        Vector<FileInputStream> fileStreams = new Vector<>();
-//        collectFiles(directory, fileStreams, includeHiddenFiles, sb);
-//
-//        try (SequenceInputStream sequenceInputStream = new SequenceInputStream(fileStreams.elements())) {
-//            sb.append("\n").append(DigestUtils.md5Hex(sequenceInputStream));
-//            return sb.toString();
-//        }
-//    }
-//
-//    private static void collectFiles(File directory,
-//                                     List<FileInputStream> fileInputStreams,
-//                                     boolean includeHiddenFiles,
-//                                     StringBuilder sb) throws IOException {
-//
-//        File[] files = directory.listFiles();
-//
-//        if (files != null) {
-//            Arrays.sort(files, Comparator.comparing(File::getName));
-//
-//            for (File file : files) {
-//                if (includeHiddenFiles || !Files.isHidden(file.toPath())) {
-//                    if (file.isDirectory()) {
-//                        //need a new vector here to calculate the md5 of each folder
-//                        collectFiles(file, fileInputStreams, includeHiddenFiles, sb);
-//                    } else {
-//                        fileInputStreams.add(new FileInputStream(file));
-//                        String md5 = DigestUtils.md5Hex(new FileInputStream(file)).toUpperCase();
-//                        log.info("MD5 for file [{}] is {}", file.getName(), md5);
-//                        sb.append("\n").append(file.getName()).append(": ").append(md5);
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     public static String prepareMD5HashMapForDirectory(String absolutePath) throws IOException {
         //put fileinputstream into hashmap
@@ -112,6 +72,47 @@ public class HashUtils {
                 md5List.put(file.getName(), DigestUtils.md5Hex(new FileInputStream(file)).toUpperCase());
             }
         }
+
+    }
+
+    public static void generateMD5Checksum(File file, Accession accession, FileChecksumRepository fileChecksumRepository) throws IOException {
+        //for each file/directory in the collection, create new FileChecksum
+        //exclude MD5CHECKSUM if it exists
+
+        HashMap<String, String> md5List = new HashMap<>();
+        HashMap<String, Vector<FileInputStream>> directoryContents = new HashMap<>();
+        directoryContents.put(file.getName(), new Vector<>());
+
+        //recursively fill the hashmap
+        fillHashMap(md5List, directoryContents, file);
+
+        directoryContents.forEach((dir,contents)->{
+            try (SequenceInputStream sequenceInputStream = new SequenceInputStream(contents.elements())) {
+                md5List.put(dir, DigestUtils.md5Hex(sequenceInputStream).toUpperCase());
+            } catch (IOException e) {
+
+            }
+        });
+
+        writeMD5ChecksumFile(file.getAbsolutePath(), md5List);
+
+        //iterate over md5List and fill out the FileChecksum fields
+        accession.setFiles(new ArrayList<>());
+        md5List.forEach((fileName, md5) -> {
+            if (!fileName.equalsIgnoreCase("MD5CHECKSUM")) {
+
+                FileChecksum fcs = fileChecksumRepository.findTop1ByChecksum(md5);
+                if (fcs == null) {
+                    fcs = new FileChecksum();
+                    fcs.setAccession(new ArrayList<>());
+                }
+                fcs.getAccession().add(accession);
+                fcs.setChecksum(md5);
+                fcs.setFileName(fileName);
+                accession.getFiles().add(fcs);
+
+            }
+        });
 
     }
 }

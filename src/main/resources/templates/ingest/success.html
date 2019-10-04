@@ -8,7 +8,9 @@
 </head>
 <body>
 <div class="container">
-    <h1>MIMS Accessioning Home</h1>
+Accession successful.<br>
+    New accession number: <span th:text="${accession.accessionNumber}"></span><br>
+    Files in accession: <span th:text="${#lists.size(accession.files)}"></span>
 </div>
 </body>
 </html>

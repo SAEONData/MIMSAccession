@@ -22,7 +22,7 @@ public class AccessionApplication {
     public FilterRegistrationBean ingestAuthenticationFilter() {
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
         registrationBean.setFilter(new IngestAuthenticationFilter(userService));
-        registrationBean.addUrlPatterns("/ingest/home");
+        registrationBean.addUrlPatterns("/ingest/*");
 
         return registrationBean;
     }

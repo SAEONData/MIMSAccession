@@ -3,17 +3,16 @@ package org.saeon.mims.accession.model.accession;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class FileChecksum {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
     @Setter
-    @Id
     private Long id;
 
     @Getter
@@ -24,9 +23,13 @@ public class FileChecksum {
     @Setter
     private String checksum;
 
+    @ManyToMany
+    @JoinTable(
+            name = "accession_files",
+            joinColumns = {@JoinColumn(name = "filechecksum_id")},
+            inverseJoinColumns = {@JoinColumn(name = "accession_id")}
+    )
     @Getter
     @Setter
-    @ManyToOne
-    @JoinColumn(name="Accession_ID", nullable=false)
-    private Accession accession;
+    private List<Accession> accession;
 }

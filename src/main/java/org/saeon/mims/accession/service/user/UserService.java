@@ -28,6 +28,8 @@ public class UserService {
         List<Role> roles = new ArrayList<>();
         roles.add(Role.USER);
         user.setRoles(roles);
+        String hashedPw = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        user.setPassword(hashedPw);
         userRepository.save(user);
 
         return user;

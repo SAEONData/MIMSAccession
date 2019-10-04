@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 import static javax.persistence.CascadeType.ALL;
 
@@ -19,6 +19,7 @@ public class Accession {
     @Getter
     @Setter
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Getter @Setter
@@ -33,10 +34,10 @@ public class Accession {
     @Getter @Setter
     private String homeFolder;
 
-    @OneToMany(cascade=ALL, mappedBy="accession")
     @Getter
     @Setter
-    private Set<FileChecksum> files;
+    @ManyToMany(cascade=ALL, mappedBy="accession")
+    private List<FileChecksum> files;
 
     @Getter
     @Setter

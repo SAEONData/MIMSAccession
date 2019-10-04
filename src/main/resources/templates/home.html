@@ -8,12 +8,14 @@
 </head>
 <body>
 <div class="container">
-    Welcome to the Marine Information Management System<br>
-    Select your option:<br>
-    <div class="mims.menu"><a class="btn btn-sm btn-primary" href="/register">Register</a></div>
-    <div class="mims.menu"><a class="btn btn-sm btn-primary" href="/">Sign In</a><br></div>
+    <h1>Welcome to the Marine Information Management System</h1>
+    <h5>Select your option:</h5>
+    <div th:if="${signedIn == false}">
+        <div class="mims.menu"><a class="btn btn-sm btn-primary" href="/register">Register</a></div>
+        <div class="mims.menu"><a class="btn btn-sm btn-primary" href="/login">Sign In</a><br></div>
+    </div>
     <div class="mims.menu"><a class="btn btn-sm btn-primary" href="/">Search the MIMS</a><br></div>
-    <div class="mims.menu"><a class="btn btn-sm btn-primary" href="/ingest">Accession some data</a><br></div>
+    <div class="mims.menu"><a class="btn btn-sm btn-primary" href="/ingest/home">Accession area</a><br></div>
     <div class="mims.menu"><a class="btn btn-sm btn-primary" href="/">Contact us</a><br></div>
 </div>
 </body>

@@ -2,6 +2,7 @@ package org.saeon.mims.accession.controller.ingest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.saeon.mims.accession.dto.user.LoginDTO;
 import org.saeon.mims.accession.model.accession.Accession;
 import org.saeon.mims.accession.model.accession.EmbargoType;
 import org.saeon.mims.accession.model.user.User;
@@ -9,95 +10,68 @@ import org.saeon.mims.accession.service.accession.AccessionService;
 import org.saeon.mims.accession.service.user.UserService;
 import org.saeon.mims.accession.util.AppUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Controller
 @Slf4j
 public class IngestController {
 
+    @Value("${base.folder}")
+    private String baseFolder;
+
     @Autowired private UserService userService;
     @Autowired private AccessionService accessionService;
 
-    private static final int MAX_SESSION_INTERVAL = 60 * 60; //1 hour
-
-    @GetMapping(value = "/ingest")
+    @GetMapping(value = "/ingest/home")
     public String getIngestHome(Model model, HttpServletRequest request) {
         String authToken = AppUtils.getAuthTokenFromRequest(request);
         if (StringUtils.isNotEmpty(authToken)) {
             User user = userService.getCurrentUser(authToken);
-            if (user == null) {
-                model.addAttribute("user", new User());
-                return "ingest/signin";
-            } else {
+            if (user != null) {
+                model.addAttribute("basefolder", baseFolder);
                 model.addAttribute("accession", new Accession());
                 model.addAttribute("embargoTypes", EmbargoType.values());
                 return "ingest/home";
             }
-        } else {
-            model.addAttribute("user", new User());
-            return "ingest/signin";
+
         }
+
+        model.addAttribute("user", new LoginDTO());
+        model.addAttribute("goto", "/ingest/home");
+        return "login/login";
 
     }
 
-    @PostMapping(value = "/ingest/signin")
-    public String signinAdmin(@ModelAttribute User details, Model model, HttpServletRequest request, HttpServletResponse response) {
-        log.debug("Signin attempt by username: " + details);
-        if (StringUtils.isNotEmpty(details.getEmail()) && StringUtils.isNotEmpty(details.getPassword())) {
-            log.debug("Details not null && not empty");
-            User user = userService.getUserByEmail(details.getEmail());
-
-            if (user != null) {
-                log.debug("Validated user from DB: " + user.toString());
-
-                if (BCrypt.checkpw(details.getPassword(), user.getPassword())) {
-                    request.getSession().setMaxInactiveInterval(MAX_SESSION_INTERVAL);
-                    user.setAuthToken(request.getSession().getId());
-                    Cookie cookie = new Cookie("mims-accession", request.getSession().getId());
-                    cookie.setMaxAge(-1);
-                    response.addCookie(cookie);
-                    userService.updateUser(user);
-                    log.info("User {} logged in with sessionid {}", user.getId(), user.getAuthToken().substring(0, 5) + "....");
-
-                    model.addAttribute("accession", new Accession());
-                    model.addAttribute("embargoTypes", EmbargoType.values());
-                    return "ingest/home";
-                } else {
-                    model.addAttribute("error", "Password incorrect");
-                    return "ingest/signin";
-                }
-
-            } else {
-                log.debug("Username not found in database");
-                model.addAttribute("error", "Username not found");
-                return "ingest/signin";
-
-            }
-        } else {
-            model.addAttribute("error", "Fields not provided");
-            return "ingest/signin";
-
-        }
+    @GetMapping(value = "/ingest/accession")
+    public String presentAccession(Model model, @ModelAttribute Accession accession) {
+        model.addAttribute("basefolder", baseFolder);
+        model.addAttribute("accession", new Accession());
+        model.addAttribute("embargoTypes", EmbargoType.values());
+        return "ingest/form";
     }
 
     @PostMapping(value = "/ingest/accession")
     public String attemptAccession(Model model, @ModelAttribute Accession accession) {
         log.debug("Accession attempted");
         if (accession != null) {
+            try {
+                accessionService.ingestAccession(accession);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         }
 
         model.addAttribute("accession", accession);
-        return "accession/success";
+        return "ingest/success";
     }
 
 }

@@ -26,6 +26,9 @@ public class Accession {
     private Long accessionNumber;
 
     @Getter @Setter
+    private String uuid;
+
+    @Getter @Setter
     private String name;
 
     @Getter @Setter

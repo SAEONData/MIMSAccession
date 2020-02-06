@@ -61,6 +61,8 @@ public class HashUtils {
     }
 
     private static void fillHashMap(HashMap<String, String> md5List, HashMap<String, Vector<FileInputStream>> directoryContents, File directory) throws IOException {
+
+        //todo-acc think carefully about RecursiveTask, ForkJoinPool and ForkJoinThread here....
         File[] files = directory.listFiles();
 
         for (File file: files) {

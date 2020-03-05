@@ -9,6 +9,7 @@ import org.saeon.mims.accession.repository.AccessionNumberRepository;
 import org.saeon.mims.accession.repository.AccessionRepository;
 import org.saeon.mims.accession.repository.FileChecksumRepository;
 import org.saeon.mims.accession.request.IngestRequest;
+import org.saeon.mims.accession.service.odp.ODPService;
 import org.saeon.mims.accession.util.CopyFileVisitor;
 import org.saeon.mims.accession.util.HashUtils;
 import org.saeon.mims.accession.util.ZipUtils;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -40,8 +42,9 @@ public class AccessionService {
     @Autowired private AccessionRepository accessionRepository;
     @Autowired private AccessionNumberRepository accessionNumberRepository;
     @Autowired private FileChecksumRepository fileChecksumRepository;
+    @Autowired private ODPService odpService;
 
-    public Accession ingestAccession(Accession accession) throws IOException {
+    public Accession ingestAccession(Accession accession) throws IOException, AccessionException {
         accession.setUuid(UUID.randomUUID().toString());
         log.debug("Accession uuid: {}", accession.getUuid());
         String fileFolder = accession.getHomeFolder();
@@ -61,7 +64,34 @@ public class AccessionService {
 
         }
 
-        //todo-acc need to move the accession to the correct folder structure.
+        try {
+            int responseStatus = odpService.addAccessionToODP(accession);
+            if (responseStatus != 200) {
+                String message = "";
+                switch (responseStatus) {
+                    case 400:
+                        message = "Bad request. Check the logs to see why this request was invalid.";
+                        break;
+                    case 403:
+                        message = "Unauthorised access. Check your API key.";
+                        break;
+                    case 404:
+                        message = "ODP server unavailable, try again later.";
+                        break;
+                    case 422:
+                        message = "Unprocessable entity. Something in the request is missing.";
+                        break;
+                    case 500:
+                        message = "ODP server error. Please contact the ODP Server administrator";
+                        break;
+                }
+                throw new AccessionException(responseStatus, message);
+            }
+
+        } catch (SocketException e) {
+            throw new AccessionException(404, "ODP Server is unavailable. Please try again later.");
+        }
+
         //create the top-level folder
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String topLevelFolder = sdf.format(new Date())+ "-" + accession.getUuid();

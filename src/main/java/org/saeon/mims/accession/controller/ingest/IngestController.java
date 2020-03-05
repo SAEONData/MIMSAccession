@@ -3,6 +3,7 @@ package org.saeon.mims.accession.controller.ingest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.saeon.mims.accession.dto.user.LoginDTO;
+import org.saeon.mims.accession.exception.AccessionException;
 import org.saeon.mims.accession.model.accession.Accession;
 import org.saeon.mims.accession.model.accession.EmbargoType;
 import org.saeon.mims.accession.model.user.User;
@@ -61,17 +62,38 @@ public class IngestController {
     @PostMapping(value = "/ingest/accession")
     public String attemptAccession(Model model, @ModelAttribute Accession accession) {
         log.debug("Accession attempted");
+        String returnPage = "ingest/success";
         if (accession != null) {
             try {
                 accessionService.ingestAccession(accession);
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (AccessionException e) {
+                log.error("Could not accession collection", e);
+                model.addAttribute("error", e.getErrorMessage());
+                switch (e.getCode()) {
+                    case 400: //bad request
+                        returnPage = "ingest/400";
+                        break;
+                    case 403: //forbidden
+                        returnPage = "ingest/403";
+                        break;
+                    case 404:
+                        returnPage = "ingest/404";
+                        break;
+                    case 422: //unprocessable entity
+                        returnPage = "ingest/422";
+                        break;
+                    case 500: //unexpected server error
+                        returnPage = "ingest/500";
+                        break;
+                }
             }
 
         }
 
         model.addAttribute("accession", accession);
-        return "ingest/success";
+        return returnPage;
     }
 
 }

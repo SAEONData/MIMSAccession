@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -93,6 +94,14 @@ public class IngestController {
         }
 
         model.addAttribute("accession", accession);
+        return returnPage;
+    }
+
+    @GetMapping("/accession/list")
+    public String getAccessionList(Model model, HttpServletRequest request) {
+        List<Accession> accessions = accessionService.getAllAccessions();
+        String returnPage = "/accession/list";
+        model.addAttribute("accessionList", accessions);
         return returnPage;
     }
 

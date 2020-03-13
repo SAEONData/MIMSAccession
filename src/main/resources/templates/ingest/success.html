@@ -8,9 +8,10 @@
 </head>
 <body>
 <div class="container">
-Accession successful.<br>
+    <h3>Accession successful</h3><br>
     New accession number: <span th:text="${accession.accessionNumber}"></span><br>
     Files in accession: <span th:text="${#lists.size(accession.files)}"></span>
+    <div class="mims.menu"><a class="btn btn-sm btn-primary" th:href="@{/ingest/home}">Back to Accession area</a><br></div>
 </div>
 </body>
 </html>

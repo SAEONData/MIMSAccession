@@ -27,7 +27,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @Slf4j
@@ -38,6 +41,9 @@ public class AccessionService {
 
     @Value("${data.folder}")
     private String baseDataFolder;
+
+    @Value("${use.odp}")
+    private boolean useODP;
 
     @Autowired private AccessionRepository accessionRepository;
     @Autowired private AccessionNumberRepository accessionNumberRepository;
@@ -64,37 +70,41 @@ public class AccessionService {
 
         }
 
-        try {
-            int responseStatus = odpService.addAccessionToODP(accession);
-            if (responseStatus != 200) {
-                String message = "";
-                switch (responseStatus) {
-                    case 400:
-                        message = "Bad request. Check the logs to see why this request was invalid.";
-                        break;
-                    case 403:
-                        message = "Unauthorised access. Check your API key.";
-                        break;
-                    case 404:
-                        message = "ODP server unavailable, try again later.";
-                        break;
-                    case 422:
-                        message = "Unprocessable entity. Something in the request is missing.";
-                        break;
-                    case 500:
-                        message = "ODP server error. Please contact the ODP Server administrator";
-                        break;
+        if (useODP) {
+            try {
+                int responseStatus = odpService.addAccessionToODP(accession);
+                if (responseStatus != 200) {
+                    String message = "";
+                    switch (responseStatus) {
+                        case 400:
+                            message = "Bad request. Check the logs to see why this request was invalid.";
+                            break;
+                        case 403:
+                            message = "Unauthorised access. Check your API key.";
+                            break;
+                        case 404:
+                            message = "ODP server unavailable, try again later.";
+                            break;
+                        case 422:
+                            message = "Unprocessable entity. Something in the request is missing.";
+                            break;
+                        case 500:
+                            message = "ODP server error. Please contact the ODP Server administrator";
+                            break;
+                    }
+                    throw new AccessionException(responseStatus, message);
                 }
-                throw new AccessionException(responseStatus, message);
-            }
 
-        } catch (SocketException e) {
-            throw new AccessionException(404, "ODP Server is unavailable. Please try again later.");
+            } catch (SocketException e) {
+                throw new AccessionException(404, "ODP Server is unavailable. Please try again later.");
+            }
         }
 
         //create the top-level folder
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String topLevelFolder = sdf.format(new Date())+ "-" + accession.getUuid();
+
+        accession.setArchiveFolder(topLevelFolder);
 
         String nextFolder = baseDataFolder + "/" + topLevelFolder + "/" + "V0.0";
 
@@ -114,13 +124,14 @@ public class AccessionService {
             //new thread possibly?
             log.info("Copying from {} to {}", file.toPath().toString(), aipDirectoryPath.toString());
             Files.walkFileTree(file.toPath(), new CopyFileVisitor(aipDirectoryPath));
-//            Files.copy(file.toPath(), aipDirectoryPath, StandardCopyOption.REPLACE_EXISTING);
             log.info("Files copied");
 
             //time to zip for the SIP
             //also think about threading this bitch
             String outputZipFile = sipDirectoryPath.toString() + File.separator + "sip.zip";
             new ZipUtils().createSIPZip(file, outputZipFile);
+
+            accessionRepository.save(accession);
 
         } catch (NoSuchFileException ex) {
             log.error("Error creating base folder", ex);
@@ -195,5 +206,10 @@ public class AccessionService {
             an.setNextAccessionNumber(accNum);
             accessionNumberRepository.save(an);
         }
+    }
+
+    public List<Accession> getAllAccessions() {
+        Iterable<Accession> accessions = accessionRepository.findAll();
+        return StreamSupport.stream(accessions.spliterator(), false).collect(Collectors.toList());
     }
 }

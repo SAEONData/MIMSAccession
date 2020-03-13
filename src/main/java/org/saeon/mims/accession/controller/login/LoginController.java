@@ -6,6 +6,7 @@ import org.saeon.mims.accession.dto.user.LoginDTO;
 import org.saeon.mims.accession.model.user.User;
 import org.saeon.mims.accession.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +23,9 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginController {
 
     @Autowired private UserService userService;
+
+    @Value("${admin.user}")
+    private String adminUserEmail;
 
     private static final int MAX_SESSION_INTERVAL = 60 * 60; //1 hour
 
@@ -51,6 +55,9 @@ public class LoginController {
                     log.info("User {} logged in with sessionid {}", user.getId(), user.getAuthToken().substring(0, 5) + "....");
 
                     String returnPage = StringUtils.isNotEmpty(details.getGotoLink()) ? details.getGotoLink() : "home";
+                    model.addAttribute("signedIn", user != null);
+                    model.addAttribute("user", user);
+                    model.addAttribute("adminEmail", adminUserEmail);
                     return returnPage;
 
                 } else {

@@ -109,6 +109,7 @@
             <artifactId>feign-slf4j</artifactId>
             <version>${feign.version}</version>
         </dependency>
+
     </dependencies>
 
     <build>

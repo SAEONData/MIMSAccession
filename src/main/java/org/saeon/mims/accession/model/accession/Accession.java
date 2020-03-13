@@ -37,6 +37,9 @@ public class Accession {
     @Getter @Setter
     private String homeFolder;
 
+    @Getter @Setter
+    private String archiveFolder;
+
     @Getter
     @Setter
     @ManyToMany(cascade=ALL, mappedBy="accession")

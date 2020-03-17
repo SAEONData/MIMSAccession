@@ -54,6 +54,11 @@ public class Accession {
     @Setter
     private Date embargoExpiry;
 
+    @Getter
+    @Setter
+    @Enumerated(value = EnumType.STRING)
+    private Status status = Status.NOT_STARTED;
+
     /******************************************
      *
      * UTILITY METHODS

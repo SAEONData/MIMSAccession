@@ -5,6 +5,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.saeon.mims.accession.exception.AccessionException;
 import org.saeon.mims.accession.model.accession.Accession;
 import org.saeon.mims.accession.model.accession.AccessionNumber;
+import org.saeon.mims.accession.model.accession.Status;
 import org.saeon.mims.accession.repository.AccessionNumberRepository;
 import org.saeon.mims.accession.repository.AccessionRepository;
 import org.saeon.mims.accession.repository.FileChecksumRepository;
@@ -51,93 +52,116 @@ public class AccessionService {
     @Autowired private ODPService odpService;
 
     public Accession ingestAccession(Accession accession) throws IOException, AccessionException {
-        accession.setUuid(UUID.randomUUID().toString());
-        log.debug("Accession uuid: {}", accession.getUuid());
-        String fileFolder = accession.getHomeFolder();
-        File file = new File(baseIngestFolder + File.separator + fileFolder);
-        log.debug("File name: {}", file.getAbsolutePath());
-        log.debug("Type: {}", file.isDirectory() ? "Directory" : file.isFile() ? "File" : "Unknown");
-        log.debug("Access Rights: {} | {} | {}",
-                file.canRead() ? "Read Allowed" : "Read Denied",
-                file.canWrite() ? "Write Allowed" : "Write Denied",
-                file.canExecute() ? "Execute Allowed" : "Execute Denied");
-
-        if (file.isDirectory()) {
-            HashUtils.generateMD5Checksum(file, accession, fileChecksumRepository);
-            accessionRepository.save(accession);
-            accession.setAccessionNumber(getNextAccessionNumber());
-            accessionRepository.save(accession);
-
-        }
-
-        if (useODP) {
-            try {
-                int responseStatus = odpService.addAccessionToODP(accession);
-                if (responseStatus != 200) {
-                    String message = "";
-                    switch (responseStatus) {
-                        case 400:
-                            message = "Bad request. Check the logs to see why this request was invalid.";
-                            break;
-                        case 403:
-                            message = "Unauthorised access. Check your API key.";
-                            break;
-                        case 404:
-                            message = "ODP server unavailable, try again later.";
-                            break;
-                        case 422:
-                            message = "Unprocessable entity. Something in the request is missing.";
-                            break;
-                        case 500:
-                            message = "ODP server error. Please contact the ODP Server administrator";
-                            break;
-                    }
-                    throw new AccessionException(responseStatus, message);
-                }
-
-            } catch (SocketException e) {
-                throw new AccessionException(404, "ODP Server is unavailable. Please try again later.");
-            }
-        }
-
-        //create the top-level folder
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String topLevelFolder = sdf.format(new Date())+ "-" + accession.getUuid();
-
-        accession.setArchiveFolder(topLevelFolder);
-
-        String nextFolder = baseDataFolder + "/" + topLevelFolder + "/" + "V0.0";
-
-        Path newDirectoryPath = Paths.get(nextFolder);
         try {
-            Files.createDirectories(newDirectoryPath);
-            Path aboutDirectoryPath = Paths.get(newDirectoryPath.toString(), "about");
-            Path dataDirectoryPath = Paths.get(newDirectoryPath.toString(), "data");
-            Files.createDirectories(aboutDirectoryPath);
-            Files.createDirectories(dataDirectoryPath);
-
-            Path sipDirectoryPath = Paths.get(dataDirectoryPath.toString(), "0-Data");
-            Path aipDirectoryPath = Paths.get(dataDirectoryPath.toString(), "1-Data");
-            Files.createDirectories(sipDirectoryPath);
-            Files.createDirectories(aipDirectoryPath);
-
-            //new thread possibly?
-            log.info("Copying from {} to {}", file.toPath().toString(), aipDirectoryPath.toString());
-            Files.walkFileTree(file.toPath(), new CopyFileVisitor(aipDirectoryPath));
-            log.info("Files copied");
-
-            //time to zip for the SIP
-            //also think about threading this bitch
-            String outputZipFile = sipDirectoryPath.toString() + File.separator + "sip.zip";
-            new ZipUtils().createSIPZip(file, outputZipFile);
-
+            accession.setStatus(Status.PENDING);
+            accession.setUuid(UUID.randomUUID().toString());
             accessionRepository.save(accession);
+            log.debug("Accession uuid: {}", accession.getUuid());
+            String fileFolder = accession.getHomeFolder();
+            File file = new File(baseIngestFolder + File.separator + fileFolder);
+            log.debug("File name: {}", file.getAbsolutePath());
+            log.debug("Type: {}", file.isDirectory() ? "Directory" : file.isFile() ? "File" : "Unknown");
+            log.debug("Access Rights: {} | {} | {}",
+                    file.canRead() ? "Read Allowed" : "Read Denied",
+                    file.canWrite() ? "Write Allowed" : "Write Denied",
+                    file.canExecute() ? "Execute Allowed" : "Execute Denied");
 
-        } catch (NoSuchFileException ex) {
-            log.error("Error creating base folder", ex);
+            if (file.isDirectory()) {
+                log.info("Accession starting");
+                accession.setStatus(Status.IN_PROGRESS);
+                HashUtils.generateMD5Checksum(file, accession, fileChecksumRepository);
+                accessionRepository.save(accession);
+                synchronized (accession) {
+                    accession.setAccessionNumber(getNextAccessionNumber());
+                    log.info("Setting accesion number: {}", accession.getAccessionNumber());
+                }
+                accessionRepository.save(accession);
+
+            }
+
+
+            log.info("Connect to ODP? {}", useODP ? "Yes" : "No");
+            if (useODP) {
+                try {
+                    log.info("Contacting ODP");
+                    int responseStatus = odpService.addAccessionToODP(accession);
+                    log.info("Response from ODP: {}", responseStatus);
+                    if (responseStatus != 200) {
+                        accession.setStatus(Status.FAILED);
+                        String message = "";
+                        switch (responseStatus) {
+                            case 400:
+                                message = "Bad request. Check the logs to see why this request was invalid.";
+                                break;
+                            case 403:
+                                message = "Unauthorised access. Check your API key.";
+                                break;
+                            case 404:
+                                message = "ODP server unavailable, try again later.";
+                                break;
+                            case 422:
+                                message = "Unprocessable entity. Something in the request is missing.";
+                                break;
+                            case 500:
+                                message = "ODP server error. Please contact the ODP Server administrator";
+                                break;
+                        }
+                        accessionRepository.save(accession);
+                        throw new AccessionException(responseStatus, message);
+                    }
+
+                } catch (SocketException e) {
+                    accession.setStatus(Status.FAILED);
+                    accessionRepository.save(accession);
+                    throw new AccessionException(404, "ODP Server is unavailable. Please try again later.");
+                }
+            }
+
+            //create the top-level folder
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            String topLevelFolder = sdf.format(new Date()) + "-" + accession.getUuid();
+
+            accession.setArchiveFolder(topLevelFolder);
+
+            String nextFolder = baseDataFolder + "/" + topLevelFolder + "/" + "V0.0";
+
+            Path newDirectoryPath = Paths.get(nextFolder);
+            try {
+                Files.createDirectories(newDirectoryPath);
+                Path aboutDirectoryPath = Paths.get(newDirectoryPath.toString(), "about");
+                Path dataDirectoryPath = Paths.get(newDirectoryPath.toString(), "data");
+                Files.createDirectories(aboutDirectoryPath);
+                Files.createDirectories(dataDirectoryPath);
+
+                Path sipDirectoryPath = Paths.get(dataDirectoryPath.toString(), "0-Data");
+                Path aipDirectoryPath = Paths.get(dataDirectoryPath.toString(), "1-Data");
+                Files.createDirectories(sipDirectoryPath);
+                Files.createDirectories(aipDirectoryPath);
+
+                //new thread possibly?
+                log.info("Copying from {} to {}", file.toPath().toString(), aipDirectoryPath.toString());
+                Files.walkFileTree(file.toPath(), new CopyFileVisitor(aipDirectoryPath));
+                log.info("Files copied");
+
+                //time to zip for the SIP
+                //also think about threading this bitch
+                String outputZipFile = sipDirectoryPath.toString() + File.separator + "sip.zip";
+                new ZipUtils().createSIPZip(file, outputZipFile);
+
+                accession.setStatus(Status.COMPLETED);
+                accessionRepository.save(accession);
+
+            } catch (NoSuchFileException ex) {
+                accession.setStatus(Status.FAILED);
+                accessionRepository.save(accession);
+                log.error("Error creating base folder", ex);
+                throw ex;
+            }
+
+            return accession;
+        } catch (Exception e) {
+            throw new AccessionException(500, "An error occurred during accessioning.", e);
         }
-
-        return accession;
     }
 
     private Long getNextAccessionNumber() {

@@ -29,4 +29,5 @@ public class AccessionException extends Exception {
         this.code = code;
         this.errorMessage = errorMessage;
     }
+
 }

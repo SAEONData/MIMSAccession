@@ -1,0 +1,9 @@
+[
+  {
+    "_class": "org.saeon.mims.accession.model.user.User",
+    "firstName": "MIMS",
+    "lastName": "Admin",
+    "email": "mims.admin@ocean.gov.za",
+    "password": "$2a$10$pZWSWdIJ91BFxHvfgsi7iOUua5iMr6dEkPXZw3QnkBSDEENNgqGwC"
+  }
+]

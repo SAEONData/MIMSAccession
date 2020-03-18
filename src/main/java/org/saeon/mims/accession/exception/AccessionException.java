@@ -2,6 +2,8 @@ package org.saeon.mims.accession.exception;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
+import org.saeon.mims.accession.apiexternal.ErrorDTO;
 
 public class AccessionException extends Exception {
 
@@ -30,4 +32,11 @@ public class AccessionException extends Exception {
         this.errorMessage = errorMessage;
     }
 
+    public AccessionException(int code, ErrorDTO errorDTO) {
+        this.code = code;
+        if (errorDTO != null && CollectionUtils.isEmpty(errorDTO.getDetail())) {
+            this.setErrorMessage(errorDTO.getDetail().get(0).getMsg());
+
+        }
+    }
 }

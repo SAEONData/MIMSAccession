@@ -77,6 +77,8 @@ public class AccessionService {
                 }
                 accessionRepository.save(accession);
 
+            } else {
+                throw new AccessionException(400, "The accession requested is not a directory");
             }
 
 
@@ -86,29 +88,6 @@ public class AccessionService {
                     log.info("Contacting ODP");
                     int responseStatus = odpService.addAccessionToODP(accession);
                     log.info("Response from ODP: {}", responseStatus);
-                    if (responseStatus != 200) {
-                        accession.setStatus(Status.FAILED);
-                        String message = "";
-                        switch (responseStatus) {
-                            case 400:
-                                message = "Bad request. Check the logs to see why this request was invalid.";
-                                break;
-                            case 403:
-                                message = "Unauthorised access. Check your API key.";
-                                break;
-                            case 404:
-                                message = "ODP server unavailable, try again later.";
-                                break;
-                            case 422:
-                                message = "Unprocessable entity. Something in the request is missing.";
-                                break;
-                            case 500:
-                                message = "ODP server error. Please contact the ODP Server administrator";
-                                break;
-                        }
-                        accessionRepository.save(accession);
-                        throw new AccessionException(responseStatus, message);
-                    }
 
                 } catch (SocketException e) {
                     accession.setStatus(Status.FAILED);

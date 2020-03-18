@@ -11,8 +11,10 @@ import feign.gson.GsonEncoder;
 import feign.okhttp.OkHttpClient;
 import lombok.extern.slf4j.Slf4j;
 import org.saeon.mims.accession.apiexternal.ErrorDTO;
+import org.saeon.mims.accession.apiexternal.ErrorDetail;
 import org.saeon.mims.accession.apiexternal.ODPClient;
 import org.saeon.mims.accession.dto.odp.ODPAccessionDTO;
+import org.saeon.mims.accession.exception.AccessionException;
 import org.saeon.mims.accession.model.accession.Accession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,7 @@ public class ODPService {
     @Value("${odp.external.url}")
     private String odpUrl;
 
-    public int addAccessionToODP(Accession accession) throws SocketException {
+    public int addAccessionToODP(Accession accession) throws SocketException, AccessionException {
         ODPAccessionDTO accessionDTO = new ODPAccessionDTO(accession, collectionKey, schemaKey);
 
         ODPClient odpClient = Feign.builder()
@@ -51,16 +53,22 @@ public class ODPService {
         try {
             Response response = odpClient.create(apiKey, accessionDTO);
             log.info("Response status: {}", response.status());
-            if (response.status() == 422) {
-                String message = null;
+            if (response.status() != 200) {
                 Reader reader = null;
 
                 try {
                     reader = response.body().asReader(Charset.defaultCharset());
                     //Easy way to read the stream and get a String object
                     String result = CharStreams.toString(reader);
-                    ErrorDTO errorDTO = new Gson().fromJson(result, ErrorDTO.class);
-                    log.error("ODP returned 422: {}", errorDTO.toString());
+                    if (response.status() == 422) {
+                        ErrorDTO errorDTO = new Gson().fromJson(result, ErrorDTO.class);
+                        log.error("ODP returned 422: {}", errorDTO.toString());
+                        throw new AccessionException(response.status(), errorDTO);
+                    } else {
+                        ErrorDetail errorDetail = new Gson().fromJson(result, ErrorDetail.class);
+                        log.error("ODP returned {}: {}", response.status(), errorDetail.getDetail());
+                        throw new AccessionException(response.status(), errorDetail.getDetail());
+                    }
                 } catch (IOException e) {
 
                     e.printStackTrace();

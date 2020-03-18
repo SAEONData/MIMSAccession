@@ -37,7 +37,8 @@ public class HomeController {
 
         model.addAttribute("signedIn", user != null);
         model.addAttribute("user", user);
-        model.addAttribute("adminEmail", adminEmail);
+        model.addAttribute("showPopulate", !accessionService.isAccessionNumberPopulated());
+        model.addAttribute("adminUser", user == null ? false : user.getEmail().equalsIgnoreCase(adminEmail));
         return "home";
     }
 

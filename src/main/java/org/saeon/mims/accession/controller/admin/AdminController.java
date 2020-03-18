@@ -22,9 +22,6 @@ public class AdminController {
     private UserService userService;
     private AccessionService accessionService;
 
-    @Value("${populate.password}")
-    private String validPopulationPassword;
-
     @Value("${next.accession.number}")
     private String nextAccessionNumber;
 

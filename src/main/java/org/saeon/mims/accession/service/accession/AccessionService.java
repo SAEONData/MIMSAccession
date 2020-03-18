@@ -160,7 +160,11 @@ public class AccessionService {
 
             return accession;
         } catch (Exception e) {
-            throw new AccessionException(500, "An error occurred during accessioning.", e);
+            if (e instanceof AccessionException) {
+                throw (AccessionException) e;
+            } else {
+                throw new AccessionException(500, "An error occurred during accessioning.", e);
+            }
         }
     }
 

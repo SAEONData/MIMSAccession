@@ -21,6 +21,7 @@
         <commons.lang.version>3.9</commons.lang.version>
         <feign.version>10.7.4</feign.version>
         <jackson.bind.version>2.9.8</jackson.bind.version>
+        <commonsio.version>2.6</commonsio.version>
     </properties>
 
     <dependencies>
@@ -114,6 +115,16 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.bind.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commonsio.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>28.2-jre</version>
         </dependency>
 
     </dependencies>

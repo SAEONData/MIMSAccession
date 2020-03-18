@@ -26,6 +26,9 @@ public class HomeController {
     @Value("${base.folder}")
     private String basefolder;
 
+    @Value("${admin.user}")
+    private String adminEmail;
+
     @GetMapping(value = "/")
     public String getHTML(Model model, HttpServletRequest request) {
         log.debug("Home page requested");
@@ -33,7 +36,8 @@ public class HomeController {
         User user = userService.getUserByAuthToken(authToken);
 
         model.addAttribute("signedIn", user != null);
-
+        model.addAttribute("user", user);
+        model.addAttribute("adminEmail", adminEmail);
         return "home";
     }
 

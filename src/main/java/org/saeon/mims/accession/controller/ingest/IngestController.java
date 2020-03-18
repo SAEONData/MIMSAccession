@@ -102,6 +102,10 @@ public class IngestController {
                         log.info("ODP returned 500");
                         returnPage = "ingest/500";
                         break;
+                    case 503: //service unavailable
+                        log.info("ODP returned 503");
+                        returnPage = "ingest/503";
+                        break;
                     default:
                         log.error("An error occurred while accessioning: {}", e.getMessage(), e);
                         returnPage = "error/ingest";

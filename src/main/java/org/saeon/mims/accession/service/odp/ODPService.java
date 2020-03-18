@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.SocketException;
+import java.nio.charset.Charset;
 
 @Service
 @Slf4j
@@ -55,7 +56,7 @@ public class ODPService {
                 Reader reader = null;
 
                 try {
-                    reader = response.body().asReader();
+                    reader = response.body().asReader(Charset.defaultCharset());
                     //Easy way to read the stream and get a String object
                     String result = CharStreams.toString(reader);
                     ErrorDTO errorDTO = new Gson().fromJson(result, ErrorDTO.class);

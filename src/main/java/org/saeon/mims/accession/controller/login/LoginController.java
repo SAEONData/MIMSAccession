@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.saeon.mims.accession.dto.user.LoginDTO;
 import org.saeon.mims.accession.model.user.User;
+import org.saeon.mims.accession.service.accession.AccessionService;
 import org.saeon.mims.accession.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginController {
 
     @Autowired private UserService userService;
+
+    @Autowired
+    private AccessionService accessionService;
 
     @Value("${admin.user}")
     private String adminUserEmail;
@@ -57,7 +61,8 @@ public class LoginController {
                     String returnPage = StringUtils.isNotEmpty(details.getGotoLink()) ? details.getGotoLink() : "home";
                     model.addAttribute("signedIn", user != null);
                     model.addAttribute("user", user);
-                    model.addAttribute("adminEmail", adminUserEmail);
+                    model.addAttribute("showPopulate", !accessionService.isAccessionNumberPopulated());
+                    model.addAttribute("adminUser", user == null ? false : user.getEmail().equalsIgnoreCase(adminUserEmail));
                     return returnPage;
 
                 } else {

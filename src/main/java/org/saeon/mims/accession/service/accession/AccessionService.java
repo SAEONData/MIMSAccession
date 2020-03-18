@@ -147,7 +147,12 @@ public class AccessionService {
         }
     }
 
-    private Long getNextAccessionNumber() {
+    public boolean isAccessionNumberPopulated() {
+        AccessionNumber an = accessionNumberRepository.findById(1).orElse(null);
+        return an != null;
+    }
+
+    private Long getNextAccessionNumber() throws AccessionException {
         Long accNum = 1L;
         synchronized (accessionNumberRepository) {
             AccessionNumber an = accessionNumberRepository.findById(1).orElse(null);
@@ -157,11 +162,10 @@ public class AccessionService {
                 accessionNumberRepository.save(an);
                 return accNum;
             } else {
-                //throw new AccessionException
+                throw new AccessionException(500, "Next accession number is not populated");
             }
 
         }
-        return accNum;
     }
 
     public Accession ingestAccessionAPI(IngestRequest ingestRequest, String basefolder) throws AccessionException {

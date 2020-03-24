@@ -21,7 +21,7 @@
             <div class="rTableCell" th:text="${accession.accessionNumber}"></div>
             <div class="rTableCell" th:text="${accession.name}"></div>
             <div class="rTableCell" th:text="${accession.embargoState.name}"></div>
-            <div class="rTableCell" th:text="${accession.embargoExpiry}">-</div>
+            <div class="rTableCell" th:text="${#dates.format(accession.embargoExpiry, 'dd MMMM yyyy')}">-</div>
             <div class="rTableCell" th:text="${accession.status?.name}">-</div>
         </div>
     </div>

@@ -17,6 +17,9 @@
     <div class="mims.menu"><a class="btn btn-sm btn-primary" href="/">Search the MIMS</a><br></div>
     <div class="mims.menu"><a class="btn btn-sm btn-primary" href="/ingest/home">Accession area</a><br></div>
     <div class="mims.menu"><a class="btn btn-sm btn-primary" href="/">Contact us</a><br></div>
+    <div th:if="${adminUser}">
+        <div th:if="${showPopulate}" class="mims.menu"><a class="btn btn-sm btn-primary" href="/admin/populate">Populate db</a><br></div>
+    </div>
 </div>
 </body>
 </html>

@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Home - MIMS Accession Area</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}" />
+    <link rel="stylesheet" th:href="@{/css/mims.css}" />
+</head>
+<body>
+<div class="container">
+    <h1>500 Error: Server error</h1>
+    <span th:text="${error}"></span><br>
+    <div class="mims.menu"><a class="btn btn-sm btn-primary" th:href="@{/}">Back to Home</a><br></div>
+</div>
+</body>
+</html>

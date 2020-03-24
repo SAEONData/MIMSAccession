@@ -26,6 +26,9 @@ public class Accession {
     private Long accessionNumber;
 
     @Getter @Setter
+    private String uuid;
+
+    @Getter @Setter
     private String name;
 
     @Getter @Setter
@@ -33,6 +36,9 @@ public class Accession {
 
     @Getter @Setter
     private String homeFolder;
+
+    @Getter @Setter
+    private String archiveFolder;
 
     @Getter
     @Setter
@@ -47,6 +53,11 @@ public class Accession {
     @Getter
     @Setter
     private Date embargoExpiry;
+
+    @Getter
+    @Setter
+    @Enumerated(value = EnumType.STRING)
+    private Status status = Status.NOT_STARTED;
 
     /******************************************
      *

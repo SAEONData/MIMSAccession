@@ -223,4 +223,8 @@ public class AccessionService {
         Iterable<Accession> accessions = accessionRepository.findAll();
         return StreamSupport.stream(accessions.spliterator(), false).collect(Collectors.toList());
     }
+
+    public Accession getAccessionByAccessionNumber(Long accessionNumber) {
+        return accessionRepository.findDistinctByAccessionNumber(accessionNumber);
+    }
 }

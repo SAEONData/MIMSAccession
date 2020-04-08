@@ -123,7 +123,7 @@ public class IngestController {
     public String getAccessionList(Model model, HttpServletRequest request) {
         log.info("Get list of accessions page requested");
         List<Accession> accessions = accessionService.getAllAccessions();
-        String returnPage = "/accession/list";
+        String returnPage = "accession/list";
         model.addAttribute("accessionList", accessions);
         return returnPage;
     }

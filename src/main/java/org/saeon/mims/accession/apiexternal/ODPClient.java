@@ -7,7 +7,7 @@ import feign.Response;
 import org.saeon.mims.accession.dto.odp.ODPAccessionDTO;
 
 public interface ODPClient {
-    @RequestLine("POST /dea/metadata")
-    @Headers({"Content-Type: application/json", "Authorization: {access_token}"})
+    @RequestLine("POST /dea/metadata/")
+    @Headers({"Content-Type: application/json", "Authorization: Bearer {access_token}"})
     Response create(@Param("access_token") String odpAccessToken, ODPAccessionDTO odpAccession);
 }

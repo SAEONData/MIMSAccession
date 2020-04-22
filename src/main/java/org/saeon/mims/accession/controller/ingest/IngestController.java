@@ -69,7 +69,30 @@ public class IngestController {
 
     @PostMapping(value = "/ingest/accession")
     public String attemptAccession(Model model, @ModelAttribute Accession accession) {
-        log.debug("Accession attempted");
+        boolean hasErrors = false;
+
+        log.debug("Validating accession input form");
+        if ((accession.getName() == null) ||  (accession.getName().length() == 0)) {
+            model.addAttribute("nameError", "Name is mandatory, please enter it above!");
+            hasErrors = true;
+        }
+        if ((accession.getHomeFolder() == null) ||  (accession.getHomeFolder().length() == 0)) {
+            model.addAttribute("homeFolderError", "Home folder is mandatory, please enter it above!");
+            hasErrors = true;
+        }
+        if ((accession.getEmbargoState().equals(EmbargoType.EMBARGOED)) && (accession.getEmbargoExpiry() == null )){
+            model.addAttribute("embargoExpiryError", "Embargo expiry date is mandatory for embargoed data, please enter it above!");
+            hasErrors = true;
+        }
+		if (hasErrors) {
+            log.debug("Form has validation errors!");
+            model.addAttribute("basefolder", baseFolder);
+            model.addAttribute("accession", new Accession());
+            model.addAttribute("embargoTypes", EmbargoType.values());
+			return "ingest/form";
+		}
+
+        log.debug("Attempting accession ...");
         String returnPage = "ingest/success";
         if (accession != null) {
             try {

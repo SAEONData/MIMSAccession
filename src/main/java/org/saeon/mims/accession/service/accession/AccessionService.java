@@ -78,6 +78,8 @@ public class AccessionService {
                 accessionRepository.save(accession);
 
             } else {
+                accession.setStatus(Status.FAILED);
+                accessionRepository.save(accession);
                 throw new AccessionException(400, "The accession requested is not a directory");
             }
 

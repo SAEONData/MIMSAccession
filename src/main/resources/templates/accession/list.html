@@ -5,6 +5,7 @@
     <title>Home - MIMS Accession Area</title>
     <link rel="stylesheet" th:href="@{/css/bootstrap.css}" />
     <link rel="stylesheet" th:href="@{/css/mims.css}" />
+    <link rel="stylesheet" th:href="@{/css/listaccession.css}" />
 </head>
 <body>
 <div class="container">
@@ -20,13 +21,18 @@
         <div class="rTableRow" th:each="accession: ${accessionList}">
             <div class="rTableCell" th:text="${accession.accessionNumber}"></div>
             <div class="rTableCell" th:text="${accession.name}"></div>
-            <div class="rTableCell" th:text="${accession.embargoState.name}"></div>
+            <div class="rTableCell" th:text="${accession.embargoState}"></div>
             <div class="rTableCell" th:text="${accession.embargoExpiry}">-</div>
             <div class="rTableCell" th:text="${accession.status?.name}">-</div>
+            <div class="dropdown">
+                <a th:href="@{/manage/{id}/(id=${accession.accessionNumber})}" class="editbtn" >Edit</a>
+            </div>
         </div>
     </div>
     <div class="mims.menu"><a class="btn btn-sm btn-primary" th:href="@{/ingest/home}">Back to Accession area</a><br></div>
 
 </div>
+
+
 </body>
 </html>

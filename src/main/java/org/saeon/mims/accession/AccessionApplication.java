@@ -33,6 +33,7 @@ public class AccessionApplication {
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
         registrationBean.setFilter(new IngestAuthenticationFilter(userService));
         registrationBean.addUrlPatterns("/ingest/*");
+        registrationBean.addUrlPatterns("/manage/*");
 
         return registrationBean;
     }

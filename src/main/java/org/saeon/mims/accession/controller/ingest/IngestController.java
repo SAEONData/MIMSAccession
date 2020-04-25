@@ -80,7 +80,8 @@ public class IngestController {
             model.addAttribute("homeFolderError", "Home folder is mandatory, please enter it above!");
             hasErrors = true;
         }
-        if ((accession.getEmbargoState().equals(EmbargoType.EMBARGOED)) && (accession.getEmbargoExpiry() == null )){
+
+        if ((accession.getEmbargoStateOriginal().equals(EmbargoType.EMBARGOED)) && (accession.getEmbargoExpiry().length() == 0)){
             model.addAttribute("embargoExpiryError", "Embargo expiry date is mandatory for embargoed data, please enter it above!");
             hasErrors = true;
         }

@@ -42,10 +42,10 @@ public class DownloadController {
         if (accession == null) {
             log.info("Accession does not exist. Accession number: {}", accessionNumber);
             return ResponseEntity.status(404).body("Accession " + accessionNumber + " not found");
-        } else if (accession.getEmbargoState().equals(EmbargoType.RESTRICTED)) {
+        } else if (accession.getEmbargoStateOriginal().equals(EmbargoType.RESTRICTED)) {
             log.info("Accession is restricted. Accession number: {}", accessionNumber);
             return ResponseEntity.status(403).body("Accession " + accessionNumber + " is restricted");
-        } else if (accession.getEmbargoState().equals(EmbargoType.EMBARGOED) && (System.currentTimeMillis() < accession.getEmbargoExpiry().getTime())) {
+        } else if (accession.getEmbargoStateOriginal().equals(EmbargoType.EMBARGOED) && (System.currentTimeMillis() < accession.getEmbargoExpiryDate().getTime())) {
             log.info("Accession is embargoed. Accession number: {}, embargo expiry: {}", accessionNumber, accession.getEmbargoExpiry());
             return ResponseEntity.status(403).body("Accession " + accessionNumber + " is embargoed");
         }

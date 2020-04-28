@@ -45,13 +45,52 @@ public class ManageAccessionController {
         }
 
         log.info("Managing accession " + accession.getName());
-        log.info(accession.getEmbargoExpiry().getClass().getSimpleName());
-
         model.addAttribute("accession", accession);
-        model.addAttribute("existingAccession", accession);
         model.addAttribute("embargoTypes", EmbargoType.values());
 
         return "manage/form";
+    }
+
+    @PostMapping("/manage/{accessionNumber}")
+    public String updateAccession(Model model, @PathVariable("accessionNumber") String accessionNumber, @ModelAttribute Accession accession) {
+        log.debug("Validating accession update form");
+        boolean hasErrors = false;
+        if ((accession.getName() == null) ||  (accession.getName().length() == 0)) {
+            model.addAttribute("nameError", "Name is mandatory, please enter it above!");
+            hasErrors = true;
+        }
+
+        if ((accession.getEmbargoStateOriginal().equals(EmbargoType.EMBARGOED)) && (accession.getEmbargoExpiry().length() == 0)){
+            model.addAttribute("embargoExpiryError", "Embargo expiry date is mandatory for embargoed data, please enter it above!");
+            hasErrors = true;
+        }
+		if (hasErrors) {
+            log.debug("Update form has validation errors!");
+            model.addAttribute("accession", accession);
+            model.addAttribute("embargoTypes", EmbargoType.values());
+			return "manage/form";
+		}
+        log.debug("Attempting to update accession ...");
+        String returnPage = "manage/success";
+        if (accession != null){
+            try {
+                // @ModelAttribute accession is a newly created Accession generated when update form is submitted
+                //       So: here we simpy update the actual accession with from the new accession
+                //           This is done since the new accession won't have variables set that aren't supplied
+                //           by the form.
+                Accession actualAccession = accessionService.getAccessionByAccessionNumber(Long.parseLong(accessionNumber));
+                actualAccession.setName(accession.getName());
+                actualAccession.setEmbargoStateWithType(accession.getEmbargoStateOriginal());
+                actualAccession.setEmbargoExpiry(accession.getEmbargoExpiry());
+                accessionService.updateAccession(actualAccession);
+                log.debug("Accession update successful");
+            } catch (AccessionException e){
+                log.error("Could not update accession!");
+                returnPage = "error/manage";
+            }
+        }
+        model.addAttribute("accession", accession);
+        return returnPage;
     }
 
     @Autowired

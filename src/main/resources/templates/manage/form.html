@@ -9,7 +9,6 @@
 <body>
 <div class="container">
 Manage existing accession.
-    <p th:text="${existingAccession.name}"></p>
     <form th:action="@{/manage/{id}/(id=${accession.accessionNumber})}" th:object="${accession}" method="post" class="form-horizontal">
 
         <div class="form-group row">
@@ -22,15 +21,13 @@ Manage existing accession.
                 <span class="hint">The name of your accession</span>
             </div>
         </div>
-       
+
         <div class="form-group row">
             <label for="embargoType" class="col-xs col-form-label col-3">Embargo type:</label>
             <div class="col-sm">
 
                 <select th:field="*{embargoState}" id="embargoType" class="form-control">
-                    <!-- <option th:value="'1'" th:text="'...'"></option>
-                    <option th:each="type : ${embargoTypes}" th:value="${type.id}" th:text="${type.name}"></option>  -->
-                    <!-- render the current embargo state first -->
+                     <!-- render the current embargo state first -->
                     <div th:with="currName=*{embargoState}" th:each="type : ${embargoTypes}">
                         <option th:if="${type.name == currName}" th:value="${type.id}" th:text="${type.name}"></option>
                     </div>
@@ -58,7 +55,7 @@ Manage existing accession.
         </div> 
 
         <div class="form-group row">
-            <button class="btn btn-primary btn-lrg" type="submit">Accession</button>
+            <button class="btn btn-primary btn-lrg" type="submit">Update</button>
             <span th:if="${error} == 'Username not found'">&nbsp;&nbsp;<a class="btn btn-primary btn-lrg" th:href="@{/register}">Register</a></span>
         </div>
     </form>

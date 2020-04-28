@@ -149,6 +149,20 @@ public class AccessionService {
         }
     }
 
+    public Accession updateAccession(Accession accession) throws  AccessionException {
+        try {
+            accessionRepository.save(accession);
+        } catch (Exception e){
+            log.error("Coult not update accession");
+            if (e instanceof AccessionException) {
+                throw (AccessionException) e;
+            } else {
+                throw new AccessionException(500, "An error occured while tryingto update accession");
+            }
+        }
+        return accession;
+    }
+
     public boolean isAccessionNumberPopulated() {
         AccessionNumber an = accessionNumberRepository.findById(1).orElse(null);
         return an != null;

@@ -104,11 +104,16 @@ public class Accession {
         if (StringUtils.isNotEmpty(date)) {
             LocalDate d = AppUtils.convertStringToDate(date);
             this.embargoExpiry = Date.from(d.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        }
+        } else 
+            this.embargoExpiry = null;
     }
 
     public void setEmbargoState(String embargoType) {
         this.embargoState = EmbargoType.getById(Integer.parseInt(embargoType));
+    }
+
+    public void setEmbargoStateWithType(EmbargoType embargoType){
+        this.embargoState = embargoType;
     }
 
 

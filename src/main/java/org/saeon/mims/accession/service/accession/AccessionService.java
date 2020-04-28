@@ -157,7 +157,23 @@ public class AccessionService {
             if (e instanceof AccessionException) {
                 throw (AccessionException) e;
             } else {
-                throw new AccessionException(500, "An error occured while tryingto update accession");
+                throw new AccessionException(500, "An error occured while trying to update accession");
+            }
+        }
+        return accession;
+    }
+
+    public Accession deleteAccession(Accession accession) throws  AccessionException {
+        try {
+            accession.setStatus(Status.DELETED);
+            accession.clearAccessionNumber();
+            accessionRepository.save(accession);
+        } catch (Exception e){
+            log.error("Coult not delete accession");
+            if (e instanceof AccessionException) {
+                throw (AccessionException) e;
+            } else {
+                throw new AccessionException(500, "An error occured while trying to delete accession");
             }
         }
         return accession;
@@ -242,5 +258,9 @@ public class AccessionService {
 
     public Accession getAccessionByAccessionNumber(Long accessionNumber) {
         return accessionRepository.findDistinctByAccessionNumber(accessionNumber);
+    }
+
+    public Accession getAccessionByUuid(String uuid) {
+        return accessionRepository.findDistinctByUuid(uuid);
     }
 }

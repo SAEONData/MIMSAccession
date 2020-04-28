@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Home - MIMS Accession management</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}" />
+    <link rel="stylesheet" th:href="@{/css/mims.css}" />
+</head>
+<body>
+<div class="container">
+    <div class="rTable">
+        <div class="rTableRow">
+            <div class="rTableHead"><strong>Accession Number</strong></div>
+            <div class="rTableHead"><strong>Name</strong></div>
+            <div class="rTableHead"><span style="font-weight: bold;">Embargo</span></div>
+            <div class="rTableHead"><span style="font-weight: bold;">Embargo expiry</span></div>
+            <div class="rTableHead"><span style="font-weight: bold;">Accession status</span></div>
+        </div>
+        <div class="rTableRow">
+            <div class="rTableCell" th:text="${accession.accessionNumber}"></div>
+            <div class="rTableCell" th:text="${accession.name}"></div>
+            <div class="rTableCell" th:text="${accession.embargoState}"></div>
+            <div class="rTableCell" th:text="${accession.embargoExpiry}">-</div>
+            <div class="rTableCell" th:text="${accession.status?.name}">-</div>
+        </div>
+    </div>
+    <h>Are you sure you want to delete the above accession? Click delete to confirm. </h><br>
+    <a th:href="@{/manage/delete/{id}/(id=${accession.uuid})}" class="deletebtn" >Delete</a>
+    <div class="mims.menu"><a class="btn btn-sm btn-primary" th:href="@{/accession/list}">Back to Accession list</a><br></div>
+</div>
+</body>
+</html>

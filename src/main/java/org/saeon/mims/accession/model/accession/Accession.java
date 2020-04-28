@@ -116,5 +116,8 @@ public class Accession {
         this.embargoState = embargoType;
     }
 
+    public void clearAccessionNumber(){
+        this.accessionNumber = null;
+    }
 
 }

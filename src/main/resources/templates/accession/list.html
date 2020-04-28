@@ -26,6 +26,7 @@
             <div class="rTableCell" th:text="${accession.status?.name}">-</div>
             <div class="dropdown">
                 <a th:href="@{/manage/{id}/(id=${accession.accessionNumber})}" class="editbtn" >Edit</a>
+                <a th:href="@{/manage/confirm-delete/{id}/(id=${accession.uuid})}" class="deletebtn" >Delete</a>
             </div>
         </div>
     </div>

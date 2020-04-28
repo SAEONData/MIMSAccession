@@ -93,6 +93,45 @@ public class ManageAccessionController {
         return returnPage;
     }
 
+    @GetMapping("/manage/confirm-delete/{uuid}")
+    public String confirmAccessionDeletion(Model model, @PathVariable("uuid") String uuid) {
+        log.info("Confirm delete accession page requested");
+
+        Accession accession = accessionService.getAccessionByUuid(uuid);
+        if (accession == null) {
+            log.info("Accession does not exist. Accession UUID: {}", uuid);
+            return "error/manage";
+        }
+
+        log.info("Confirming accession deletion" + accession.getName());
+        model.addAttribute("accession", accession);
+
+        return "manage/delete_confirmation";
+    }
+
+    @GetMapping("/manage/delete/{uuid}")
+    public String deleteAccession(Model model, @PathVariable("uuid") String uuid) {
+        log.info("Attempting to delete accession");
+
+        Accession accession = accessionService.getAccessionByUuid(uuid);
+        String returnPage = "manage/delete_success";
+        if (accession == null) {
+            log.info("Accession does not exist. Accession UUID: {}", uuid);
+            return "error/manage";
+        } else {
+            try {
+                    accessionService.deleteAccession(accession);
+                    log.debug("Accession deletion successful");
+            } catch (AccessionException e){
+                log.error("Could not delete accession!");
+                returnPage = "error/manage";
+            }
+        }
+
+        log.info("Confirming accession deletion" + accession.getName());
+        return returnPage;
+    }
+
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;

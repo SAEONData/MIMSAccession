@@ -13,7 +13,8 @@ public enum Status {
     PENDING(2, "Pending"),
     IN_PROGRESS(3, "In progress"),
     FAILED(4, "Failed"),
-    COMPLETED(5, "Accessioned");
+    COMPLETED(5, "Accessioned"),
+    DELETED(6, "Deleted");
 
     @Getter
     @Setter

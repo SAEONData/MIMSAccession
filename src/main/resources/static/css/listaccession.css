@@ -20,6 +20,28 @@
   background-color: #2980B9;
 }
 
+.deletebtn {
+  background-color: rgb(219, 52, 52);
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+
+  padding:8px 16px;
+  vertical-align:middle;
+  overflow:hidden;
+  text-decoration:none;
+  text-align:center;
+  cursor:pointer;
+  white-space:nowrap
+}
+
+.deletebtn:hover, .dropbtn:focus {
+  background-color: rgb(219, 52, 52);
+}
+
 .dropdown {
   position: relative;
   display: inline-block;

@@ -12,21 +12,21 @@
     <h2>Accessions</h2>
     <div class="rTable">
         <div class="rTableRow">
-            <div class="rTableHead"><strong>Accession Number</strong></div>
+            <div class="rTableHead"><strong>Accession ID</strong></div>
             <div class="rTableHead"><strong>Name</strong></div>
             <div class="rTableHead"><span style="font-weight: bold;">Embargo</span></div>
             <div class="rTableHead"><span style="font-weight: bold;">Embargo expiry</span></div>
             <div class="rTableHead"><span style="font-weight: bold;">Accession status</span></div>
         </div>
         <div class="rTableRow" th:each="accession: ${accessionList}">
-            <div class="rTableCell" th:text="${accession.accessionNumber}"></div>
+            <div class="rTableCell" th:text="${accession.accessionID}"></div>
             <div class="rTableCell" th:text="${accession.name}"></div>
             <div class="rTableCell" th:text="${accession.embargoState}"></div>
             <div class="rTableCell" th:text="${accession.embargoExpiry}">-</div>
             <div class="rTableCell" th:text="${accession.status?.name}">-</div>
             <div class="dropdown">
-                <a th:href="@{/manage/{id}/(id=${accession.accessionNumber})}" class="editbtn" >Edit</a>
-                <a th:href="@{/manage/confirm-delete/{id}/(id=${accession.uuid})}" class="deletebtn" >Delete</a>
+                <a th:href="@{/manage/{id}/(id=${accession.accessionID})}" class="editbtn" >Edit</a>
+                <a th:href="@{/manage/confirm-delete/{id}/(id=${accession.accessionID})}" class="deletebtn" >Delete</a>
             </div>
         </div>
     </div>

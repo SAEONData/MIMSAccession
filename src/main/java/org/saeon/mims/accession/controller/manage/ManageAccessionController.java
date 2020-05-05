@@ -34,13 +34,13 @@ public class ManageAccessionController {
     private UserService userService;
     private AccessionService accessionService;
 
-    @GetMapping("/manage/{accessionNumber}")
-    public String presentAccessionToManage(Model model, @PathVariable("accessionNumber") String accessionNumber) {
+    @GetMapping("/manage/{accessionID}")
+    public String presentAccessionToManage(Model model, @PathVariable("accessionID") String accessionID) {
         log.info("Manage accession page requested");
 
-        Accession accession = accessionService.getAccessionByAccessionNumber(Long.parseLong(accessionNumber));
+        Accession accession = accessionService.getAccessionByAccessionID(accessionID);
         if (accession == null) {
-            log.info("Accession does not exist. Accession number: {}", accessionNumber);
+            log.info("Accession does not exist. Accession number: {}", accessionID);
             return "error/manage";
         }
 
@@ -51,8 +51,8 @@ public class ManageAccessionController {
         return "manage/form";
     }
 
-    @PostMapping("/manage/{accessionNumber}")
-    public String updateAccession(Model model, @PathVariable("accessionNumber") String accessionNumber, @ModelAttribute Accession accession) {
+    @PostMapping("/manage/{accessionID}")
+    public String updateAccession(Model model, @PathVariable("accessionID") String accessionID, @ModelAttribute Accession accession) {
         log.debug("Validating accession update form");
         boolean hasErrors = false;
         if ((accession.getName() == null) ||  (accession.getName().length() == 0)) {
@@ -78,7 +78,7 @@ public class ManageAccessionController {
                 //       So: here we simpy update the actual accession with from the new accession
                 //           This is done since the new accession won't have variables set that aren't supplied
                 //           by the form.
-                Accession actualAccession = accessionService.getAccessionByAccessionNumber(Long.parseLong(accessionNumber));
+                Accession actualAccession = accessionService.getAccessionByAccessionID(accessionID);
                 actualAccession.setName(accession.getName());
                 actualAccession.setEmbargoStateWithType(accession.getEmbargoStateOriginal());
                 actualAccession.setEmbargoExpiry(accession.getEmbargoExpiry());
@@ -93,13 +93,13 @@ public class ManageAccessionController {
         return returnPage;
     }
 
-    @GetMapping("/manage/confirm-delete/{uuid}")
-    public String confirmAccessionDeletion(Model model, @PathVariable("uuid") String uuid) {
+    @GetMapping("/manage/confirm-delete/{accessionID}")
+    public String confirmAccessionDeletion(Model model, @PathVariable("accessionID") String accessionID) {
         log.info("Confirm delete accession page requested");
 
-        Accession accession = accessionService.getAccessionByUuid(uuid);
+        Accession accession = accessionService.getAccessionByAccessionID(accessionID);
         if (accession == null) {
-            log.info("Accession does not exist. Accession UUID: {}", uuid);
+            log.info("Accession does not exist. AccessionID: {}", accessionID);
             return "error/manage";
         }
 
@@ -109,14 +109,14 @@ public class ManageAccessionController {
         return "manage/delete_confirmation";
     }
 
-    @GetMapping("/manage/delete/{uuid}")
-    public String deleteAccession(Model model, @PathVariable("uuid") String uuid) {
+    @GetMapping("/manage/delete/{accessionID}")
+    public String deleteAccession(Model model, @PathVariable("accessionID") String accessionID) {
         log.info("Attempting to delete accession");
 
-        Accession accession = accessionService.getAccessionByUuid(uuid);
+        Accession accession = accessionService.getAccessionByAccessionID(accessionID);
         String returnPage = "manage/delete_success";
         if (accession == null) {
-            log.info("Accession does not exist. Accession UUID: {}", uuid);
+            log.info("Accession does not exist. AccessionID: {}", accessionID);
             return "error/manage";
         } else {
             try {

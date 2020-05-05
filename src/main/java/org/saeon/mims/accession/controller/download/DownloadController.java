@@ -33,28 +33,28 @@ public class DownloadController {
     @Autowired
     private AccessionService accessionService;
 
-    @GetMapping("/download/{accessionNumber}")
-    public ResponseEntity downloadFileFromLocal(@PathVariable("accessionNumber") String accessionNumber) {
-        log.info("Download accession requested: {}", accessionNumber);
+    @GetMapping("/download/{accessionID}")
+    public ResponseEntity downloadFileFromLocal(@PathVariable("accessionID") String accessionID) {
+        log.info("Download accession requested: {}", accessionID);
 
-        Accession accession = accessionService.getAccessionByAccessionNumber(Long.parseLong(accessionNumber));
+        Accession accession = accessionService.getAccessionByAccessionID(accessionID);
 
         if (accession == null) {
-            log.info("Accession does not exist. Accession number: {}", accessionNumber);
-            return ResponseEntity.status(404).body("Accession " + accessionNumber + " not found");
+            log.info("Accession does not exist. Accession number: {}", accessionID);
+            return ResponseEntity.status(404).body("Accession " + accessionID + " not found");
         } else if (accession.getEmbargoStateOriginal().equals(EmbargoType.RESTRICTED)) {
-            log.info("Accession is restricted. Accession number: {}", accessionNumber);
-            return ResponseEntity.status(403).body("Accession " + accessionNumber + " is restricted");
+            log.info("Accession is restricted. Accession number: {}", accessionID);
+            return ResponseEntity.status(403).body("Accession " + accessionID + " is restricted");
         } else if (accession.getEmbargoStateOriginal().equals(EmbargoType.EMBARGOED) && (System.currentTimeMillis() < accession.getEmbargoExpiryDate().getTime())) {
-            log.info("Accession is embargoed. Accession number: {}, embargo expiry: {}", accessionNumber, accession.getEmbargoExpiry());
-            return ResponseEntity.status(403).body("Accession " + accessionNumber + " is embargoed");
+            log.info("Accession is embargoed. Accession number: {}, embargo expiry: {}", accessionID, accession.getEmbargoExpiry());
+            return ResponseEntity.status(403).body("Accession " + accessionID + " is embargoed");
         }
 
-        log.info("Accession safe to download. Accession number: {}", accessionNumber);
+        log.info("Accession safe to download. Accession number: {}", accessionID);
         String baseFolder = accession.getArchiveFolder();
 
         String fullPath = dataFolder + File.separator + baseFolder + File.separator + folderStructure + File.separator + downloadFileName;
-        log.info("Full path to accession number [{}]: {}", accessionNumber, fullPath);
+        log.info("Full path to accession number [{}]: {}", accessionID, fullPath);
 
         Path path = Paths.get(fullPath);
         Resource resource = null;
@@ -64,7 +64,7 @@ public class DownloadController {
             e.printStackTrace();
         }
 
-        log.info("Returning sip for accession number {}", accessionNumber);
+        log.info("Returning sip for accession number {}", accessionID);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")

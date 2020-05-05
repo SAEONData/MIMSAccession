@@ -46,6 +46,9 @@ public class AccessionService {
     @Value("${use.odp}")
     private boolean useODP;
 
+    @Value("${accession.id.prefix}")
+    private String accessionIdPrefix;
+
     @Autowired private AccessionRepository accessionRepository;
     @Autowired private AccessionNumberRepository accessionNumberRepository;
     @Autowired private FileChecksumRepository fileChecksumRepository;
@@ -57,6 +60,22 @@ public class AccessionService {
             accession.setUuid(UUID.randomUUID().toString());
             accessionRepository.save(accession);
             log.debug("Accession uuid: {}", accession.getUuid());
+
+            String accessionID = accessionIdPrefix + "-" + accession.getUuid().substring(0,8);
+            Accession accDuplicate = this.getAccessionByAccessionID(accessionID);
+            if (accDuplicate == null) {
+                accession.setAccessionID(accessionID);
+                log.info("Setting accesion ID: {}", accession.getAccessionID());
+                accessionRepository.save(accession);
+            } else {
+                accession.setStatus(Status.FAILED);
+                accessionRepository.save(accession);
+                String msg = accessionID + " auto-generated Accession ID already exists, please try again.";
+                log.debug("Could not add accession {}. auto-generated ID already exists", accessionID);
+                throw new AccessionException(400, msg);
+            }
+
+
             String fileFolder = accession.getHomeFolder();
             File file = new File(baseIngestFolder + File.separator + fileFolder);
             log.debug("File name: {}", file.getAbsolutePath());
@@ -166,10 +185,9 @@ public class AccessionService {
     public Accession deleteAccession(Accession accession) throws  AccessionException {
         try {
             accession.setStatus(Status.DELETED);
-            accession.clearAccessionNumber();
             accessionRepository.save(accession);
         } catch (Exception e){
-            log.error("Coult not delete accession");
+            log.error("Could not delete accession");
             if (e instanceof AccessionException) {
                 throw (AccessionException) e;
             } else {
@@ -258,6 +276,10 @@ public class AccessionService {
 
     public Accession getAccessionByAccessionNumber(Long accessionNumber) {
         return accessionRepository.findDistinctByAccessionNumber(accessionNumber);
+    }
+
+    public Accession getAccessionByAccessionID(String accessionID) {
+        return accessionRepository.findDistinctByAccessionID(accessionID);
     }
 
     public Accession getAccessionByUuid(String uuid) {

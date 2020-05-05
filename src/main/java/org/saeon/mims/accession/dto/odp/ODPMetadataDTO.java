@@ -19,7 +19,7 @@ public class ODPMetadataDTO {
     public ODPMetadataDTO() {}
 
     public ODPMetadataDTO(Accession accession) {
-        this.accession_number = String.valueOf(accession.getAccessionNumber());
+        this.accession_number = accession.getAccessionID();
         this.uuid = accession.getUuid();
     }
 

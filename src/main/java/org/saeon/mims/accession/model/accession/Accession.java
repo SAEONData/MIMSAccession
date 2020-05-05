@@ -29,6 +29,9 @@ public class Accession {
     private Long id;
 
     @Getter @Setter
+    private String accessionID;
+
+    @Getter @Setter
     private Long accessionNumber;
 
     @Getter @Setter
@@ -115,9 +118,4 @@ public class Accession {
     public void setEmbargoStateWithType(EmbargoType embargoType){
         this.embargoState = embargoType;
     }
-
-    public void clearAccessionNumber(){
-        this.accessionNumber = null;
-    }
-
 }

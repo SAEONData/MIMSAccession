@@ -9,7 +9,7 @@
 <body>
 <div class="container">
 Manage existing accession.
-    <form th:action="@{/manage/{id}/(id=${accession.accessionNumber})}" th:object="${accession}" method="post" class="form-horizontal">
+    <form th:action="@{/manage/{id}/(id=${accession.accessionID})}" th:object="${accession}" method="post" class="form-horizontal">
 
         <div class="form-group row">
             <label for="accessionName" class="col-xs col-form-label col-3">Accession description:</label>

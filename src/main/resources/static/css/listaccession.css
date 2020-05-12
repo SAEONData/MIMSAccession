@@ -1,62 +1,36 @@
-.editbtn {
+/* Dropdown Button */
+.dropbtn {
   background-color: #3498DB;
   color: white;
   padding: 16px;
   font-size: 16px;
   border: none;
   cursor: pointer;
-  display: inline-block;
-
-  padding:8px 16px;
-  vertical-align:middle;
-  overflow:hidden;
-  text-decoration:none;
-  text-align:center;
-  cursor:pointer;
-  white-space:nowrap
 }
 
-.editbtn:hover, .dropbtn:focus {
-  background-color: #2980B9;
+/* Dropdown button on hover & focus */
+.dropbtn:hover, .dropbtn:focus {
+  background-color: rgb(126, 169, 197);
 }
 
-.deletebtn {
-  background-color: rgb(219, 52, 52);
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-  display: inline-block;
-
-  padding:8px 16px;
-  vertical-align:middle;
-  overflow:hidden;
-  text-decoration:none;
-  text-align:center;
-  cursor:pointer;
-  white-space:nowrap
-}
-
-.deletebtn:hover, .dropbtn:focus {
-  background-color: rgb(219, 52, 52);
-}
-
+/* The container <div> - needed to position the dropdown content */
 .dropdown {
   position: relative;
   display: inline-block;
 }
 
+/* Dropdown Content (Hidden by Default) */
 .dropdown-content {
+  left:40px;
   display: none;
   position: absolute;
   background-color: #f1f1f1;
-  min-width: 160px;
-  overflow: auto;
+  min-width: 5ch;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
 }
 
+/* Links inside the dropdown */
 .dropdown-content a {
   color: black;
   padding: 12px 16px;
@@ -64,6 +38,8 @@
   display: block;
 }
 
-.dropdown a:hover {background-color: #ddd;}
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd}
 
-.show {display: block;}
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}

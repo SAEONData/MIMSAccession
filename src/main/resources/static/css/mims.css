@@ -53,7 +53,15 @@ h6 {
     display: table-cell;
     padding: 3px 10px;
     border: 1px solid #999999;
+    max-width: 50ch;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: middle;
+    text-align: left;
+
 }
+
 .rTableHeading {
     display: table-header-group;
     background-color: #ddd;

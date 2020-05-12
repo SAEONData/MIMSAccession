@@ -1,10 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Inconsolata|Forum|EB+Garamond');
 
 * {
-    font-family: 'EB Garamond', cursive;
+    font-family: 'Arial';
 }
 
 .mims\.menu {
+    font-family: 'Arial';
     padding: 5px;
 }
 
@@ -14,19 +15,24 @@
 }
 
 h1 {
-    font-family: 'EB Garamond', cursive;
+    font-family: 'Arial';
     padding-bottom: 5px;
     border-bottom: 2px solid;
 }
 
+h2 {
+    font-family: 'Arial';
+    padding-bottom: 5px;
+}
+
 h5 {
-    font-family: 'Forum', cursive;
+    font-family: 'Arial';
     border-bottom: 1px solid;
     padding: 2px;
 }
 
 h6 {
-    font-family: 'Inconsolata', cursive;
+    font-family: 'Arial';
 }
 
 .table-row {
@@ -53,7 +59,7 @@ h6 {
     display: table-cell;
     padding: 3px 10px;
     border: 1px solid #999999;
-    max-width: 50ch;
+    max-width: 100ch;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;

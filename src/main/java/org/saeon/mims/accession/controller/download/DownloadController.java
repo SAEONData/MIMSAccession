@@ -11,6 +11,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,8 +35,12 @@ public class DownloadController {
     private AccessionService accessionService;
 
     @GetMapping("/download/{accessionID}")
-    public ResponseEntity downloadFileFromLocal(@PathVariable("accessionID") String accessionID) {
+    public ResponseEntity downloadFileFromLocal(@PathVariable("accessionID") String accessionID, HttpServletRequest request) {
         log.info("Download accession requested: {}", accessionID);
+
+        log.info("IP Addressification" + request.getRemoteAddr());
+        String ipAddress = request.getHeader("X-FORWARDED-FOR");
+        log.info("XFORWARD ADDR: " + ipAddress);
 
         Accession accession = accessionService.getAccessionByAccessionID(accessionID);
 

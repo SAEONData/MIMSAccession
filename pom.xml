@@ -20,7 +20,7 @@
         <commons.codec.version>1.12</commons.codec.version>
         <commons.lang.version>3.9</commons.lang.version>
         <feign.version>10.7.4</feign.version>
-        <jackson.bind.version>2.9.8</jackson.bind.version>
+        <jackson.bind.version>2.13.4.1</jackson.bind.version>
         <commonsio.version>2.6</commonsio.version>
         <commonscollection.version>4.4</commonscollection.version>
     </properties>
